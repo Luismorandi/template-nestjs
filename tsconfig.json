@@ -11,11 +11,21 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "strict": true,                  // Habilita todas las opciones estrictas de TypeScript
+    "noImplicitAny": true,           // No permite usar 'any' implícitamente
+    "strictNullChecks": true,        // Activa el chequeo estricto de valores null/undefined
+    "strictFunctionTypes": true,     // Requiere que las funciones sean estrictamente tipadas
+    "strictBindCallApply": true,     // Hace chequeo estricto de los métodos 'bind', 'call' y 'apply'
+    "noImplicitThis": true,          // Impide el uso implícito de 'this' sin tipo
+    "alwaysStrict": true,            // Activa el modo estricto en todos los archivos
+    "noUnusedLocals": true,          // Reporta errores si hay variables locales no utilizadas
+    "noUnusedParameters": true,      // Reporta errores si hay parámetros no utilizados
+    "noImplicitReturns": true,       // Asegura que todas las funciones tengan un valor de retorno explícito
+    "noFallthroughCasesInSwitch": true, // Previene caídas accidentales en los casos de 'switch'
+    "esModuleInterop": true,         // Habilita interoperabilidad con módulos CommonJS
+    "skipLibCheck": true,            // Omite la comprobación de los tipos en los archivos de definición de las bibliotecas (opcional, mejora la velocidad)
+    "forceConsistentCasingInFileNames": true, // Fuerza la consistencia en el uso de mayúsculas y minúsculas en los nombres de los archivos
+    "strictPropertyInitialization": false,
+
   }
 }
