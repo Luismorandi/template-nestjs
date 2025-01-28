@@ -3,51 +3,87 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../domain/user.domain';
 import { UserEntity } from './user.entity';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UserRepository {
     constructor(
         @InjectRepository(UserEntity)
-        private readonly userRepository: Repository<UserEntity>, // Inyectamos el repositorio base
+        private readonly userRepository: Repository<UserEntity>,
     ) {}
 
-    async getByEmail(email: string): Promise<UserEntity | null> {
-        return this.userRepository
-            .createQueryBuilder('user')
-            .where('user.email = :email', { email })
-            .getOne();
+    async getByEmail(email: string): Promise<User | null> {
+        try {
+            const user = await this.userRepository
+                .createQueryBuilder('user')
+                .where('user.email = :email', { email })
+                .getOne();
+
+            return user ? this.toDomain(user) : null;
+        } catch (err) {
+            throw new Error(`Failed to fetch user by email: ${(err as Error).message}`);
+        }
     }
 
     async getUsersWithCustomFilter(filters: any): Promise<UserEntity[]> {
-        const queryBuilder = this.userRepository.createQueryBuilder('user');
+        try {
+            const queryBuilder = this.userRepository.createQueryBuilder('user');
 
-        if (filters.name) {
-            queryBuilder.andWhere('user.name LIKE :name', { name: `%${filters.name}%` });
+            if (filters.name) {
+                queryBuilder.andWhere('user.name LIKE :name', { name: `%${filters.name}%` });
+            }
+
+            if (filters.email) {
+                queryBuilder.andWhere('user.email LIKE :email', {
+                    email: `%${filters.email}%`,
+                });
+            }
+
+            return await queryBuilder.getMany();
+        } catch (err) {
+            throw new Error(`Failed to fetch users with filters: ${(err as Error).message}`);
         }
-
-        if (filters.email) {
-            queryBuilder.andWhere('user.email LIKE :email', {
-                email: `%${filters.email}%`,
-            });
-        }
-
-        return queryBuilder.getMany();
     }
 
-    async save(user: User): Promise<UserEntity> {
-        const newUser = this.toDomain(user);
-        return this.userRepository.save(newUser);
+    async save(user: User): Promise<null|Error> {
+        try {
+            const userRepository = this.fromDomain(user);
+            await this.userRepository.save(userRepository);
+            return null;
+        } catch (err) {
+            throw new Error(`Failed to save user: ${(err as Error).message}`);
+        }
     }
 
-    private toDomain(user: User): UserEntity {
-        const userEntity: UserEntity = {
-            id: user.id,
-            last_name: user.lastName,
-            first_name: user.firstName,
-            email: user.email,
-            created_at: user.createdAt,
-            updated_at: user.updatedAt,
-        };
-        return userEntity;
+    private toDomain(user: UserEntity): User {
+        try {
+            return new User(
+                user.id,
+                user.last_name,
+                user.first_name,
+                user.email,
+                user.created_at,
+                user.updated_at,
+            );
+        } catch (err) {
+            throw new Error(`Failed to map entity to domain: ${(err as Error).message}`);
+        }
+    }
+
+    private fromDomain(user: User): UserEntity {
+        try {
+            const id = user.id ? user.id : randomUUID();
+            console.log(id)
+            return {
+                id: id,
+                email: user.email,
+                first_name: user.firstName,
+                last_name: user.lastName,
+                created_at: user.createdAt,
+                updated_at: user.updatedAt,
+            };
+        } catch (err) {
+            throw new Error(`Failed to map domain to entity: ${(err as Error).message}`);
+        }
     }
 }

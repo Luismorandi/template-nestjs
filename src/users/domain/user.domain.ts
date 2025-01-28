@@ -4,7 +4,7 @@ export interface UserRepository{
     get(id: string): User
 }
 export class User {
-    id: string;
+    id: string |null;
     firstName: string;
     lastName: string;
     email: string;
@@ -12,7 +12,7 @@ export class User {
     updatedAt: Date;
   
     constructor(
-      id: string,
+      id: string|null,
       firstName: string,
       lastName: string,
       email: string,
@@ -31,7 +31,7 @@ export class User {
        this.update();
     }
 
-    update(): void {
+   private update(): void {
         this.updatedAt = new Date();
     }
 

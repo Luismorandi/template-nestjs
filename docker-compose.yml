@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: test_container
+    environment:
+      POSTGRES_USER: luis_morandi       # Usuario de la base de datos
+      POSTGRES_PASSWORD: e6f0fcf1-eac7-4463-b955-bc389f7e7ce8   # Contraseña de la base de datos
+      POSTGRES_DB: test_db           # Nombre de la base de datos
+    ports:
+      - "5430:5432"                    # Expone el puerto 5432 de PostgreSQL
