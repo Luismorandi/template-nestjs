@@ -1,18 +1,25 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from '../domain/user.domain';
 import { CreateUserInput } from '../domain/user.types';
 import { UserRepository } from '../infrastructure/user.repository';
+import { AppLogger } from 'src/shared/logger/logger.service';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly userRepository: UserRepository) {}
+    private readonly logger: AppLogger= new AppLogger().withCtx(UsersService.name)
+    constructor(private readonly userRepository: UserRepository, 
+    ) {
+    }
+  
+
+
 
     async create(input: CreateUserInput): Promise<User> {
-        try {
             const email = input.email.toLowerCase();
             const existingUser = await this.userRepository.getByEmail(email);
     
             if (existingUser) {
+                this.logger.error(`User with email ${email} already exists.`);  
                 throw new ConflictException('User with this email already exists'); 
             }
     
@@ -28,21 +35,15 @@ export class UsersService {
             await this.userRepository.save(newUser);
     
             return newUser;
-        } catch (error) {
-            if (error instanceof ConflictException) {
-                throw error; // Ya lanzamos el error con código 409 en el caso de conflicto
-              } else {
-                // Si ocurre un error inesperado con la base de datos
-                throw new InternalServerErrorException('Failed to create user'); // Error 500
-              }        }
+       
     }
     
 
     async get(email: string): Promise<User | Error> {
-        try {
             const user = await this.userRepository.getByEmail(email);
 
             if (!user) {
+                this.logger.error(`User with email ${email} dont exist.`);
                 throw new Error(`User with email ${email} dont exist.`);
             }
             const newUser = new User(
@@ -57,8 +58,5 @@ export class UsersService {
             await this.userRepository.save(newUser);
             
             return newUser;
-        } catch (err) {
-            throw new Error(`Error trying get user  with email ${email}.`);
-        }
     }
 }

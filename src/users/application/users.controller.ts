@@ -1,4 +1,4 @@
-import { Body, ConflictException, Controller, Get, InternalServerErrorException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../domain/user.domain';
 import { CreateUserInput } from '../domain/user.types';
@@ -12,7 +12,6 @@ export class UsersController {
     @Get(':id')
     async getUserById(@Param('id') id: string): Promise<User> {
         const response =await this.usersService.get(id);
-        console.log('pase')
         if (response instanceof Error) {
             console.log('pase')
             throw new Error(response.message);
@@ -22,18 +21,8 @@ export class UsersController {
 
     @Post('')
     async createUser(@Body() input: CreateUserInput): Promise<User> {
-        try {
             const newUser = await this.usersService.create(input);
-      
             return newUser;
-          } catch (error) {
-            if (error instanceof ConflictException) {
-              throw new ConflictException(error.message);
-            } else if (error instanceof InternalServerErrorException) {
-              throw new InternalServerErrorException(error.message);
-            } else {
-              throw new InternalServerErrorException('Unexpected error occurred');
-            }
+      
     }
-}
 }
