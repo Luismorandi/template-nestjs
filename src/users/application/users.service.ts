@@ -10,8 +10,6 @@ export class UsersService {
     constructor(private readonly userRepository: UserRepository, 
     ) {
     }
-  
-
 
 
     async create(input: CreateUserInput): Promise<User> {
@@ -46,17 +44,21 @@ export class UsersService {
                 this.logger.error(`User with email ${email} dont exist.`);
                 throw new Error(`User with email ${email} dont exist.`);
             }
-            const newUser = new User(
-                user.id,
-                user.firstName,
-                user.lastName,
-                email,
-                new Date(),
-                new Date(),
-            );
+        
 
-            await this.userRepository.save(newUser);
+            await this.userRepository.save(user);
             
-            return newUser;
+            return user;
     }
+
+    async getAll(): Promise<User[] > {
+        const users = await this.userRepository.getUsersWithCustomFilter(null);
+
+        if (users.length === 0) {
+            this.logger.error(`Not found users `);
+            throw new Error(`Not found users `);
+        }
+
+        return users;
+}
 }

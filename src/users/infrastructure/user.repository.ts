@@ -25,21 +25,23 @@ export class UserRepository {
         }
     }
 
-    async getUsersWithCustomFilter(filters: any): Promise<UserEntity[]> {
+    async getUsersWithCustomFilter(filters: any): Promise<User[]> {
         try {
-            const queryBuilder = this.userRepository.createQueryBuilder('user');
+            const queryBuilder = this.userRepository.createQueryBuilder('user_entity');
 
-            if (filters.name) {
-                queryBuilder.andWhere('user.name LIKE :name', { name: `%${filters.name}%` });
+            if (filters?.name) {
+                queryBuilder.andWhere('user_entity.name LIKE :name', { name: `%${filters.name}%` });
             }
 
-            if (filters.email) {
-                queryBuilder.andWhere('user.email LIKE :email', {
+            if (filters?.email) {
+                queryBuilder.andWhere('user_entity.email LIKE :email', {
                     email: `%${filters.email}%`,
                 });
             }
 
-            return await queryBuilder.getMany();
+
+          const users= await queryBuilder.getMany();
+          return users.map(user => this.toDomain(user));
         } catch (err) {
             throw new Error(`Failed to fetch users with filters: ${(err as Error).message}`);
         }

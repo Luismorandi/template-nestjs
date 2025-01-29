@@ -18,6 +18,11 @@ export class UsersController {
         }
         return response;
     }
+    @Get('')
+    async getAllUsers(): Promise<User[]> {
+        const response =await this.usersService.getAll();
+        return response;
+    }
 
     @Post('')
     async createUser(@Body() input: CreateUserInput): Promise<User> {
@@ -25,4 +30,5 @@ export class UsersController {
             return newUser;
       
     }
+    
 }
