@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './users/infrastructure/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { SharedModule } from './shared/shared.module';
+import { ExamplesModule } from './example_module/example.module';
 
 @Module({
   imports: [  ConfigModule.forRoot({
@@ -20,7 +21,7 @@ import { SharedModule } from './shared/shared.module';
     database: process.env.DATABASE_NAME,
     entities: [UserEntity],
     synchronize: true,
-  }),UsersModule,SharedModule],
+  }),UsersModule,SharedModule,ExamplesModule],
   controllers: [AppController],
   providers: [AppService],
 })
